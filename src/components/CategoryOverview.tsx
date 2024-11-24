@@ -27,11 +27,19 @@ export const CategoryOverview: React.FC<CategoryOverviewProps> = ({ categories, 
           <p className="text-gray-600 text-sm mb-4">{description}</p>
           <div className="space-y-3">
             {getTopStrengthsByCategory(category).map((strength) => (
-              <div key={strength.name} className="flex items-center justify-between">
-                <span className="text-gray-700">{strength.name}</span>
-                <span className="text-sm font-medium text-gray-500">
-                  {strength.coefficient.toFixed(3)}
-                </span>
+              <div key={strength.name} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">{strength.name}</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    {strength.coefficient.toFixed(3)}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full ${color.replace('bg-', 'bg-opacity-80 bg-')}`}
+                    style={{ width: `${(strength.coefficient / 2) * 100}%` }}
+                  />
+                </div>
               </div>
             ))}
           </div>

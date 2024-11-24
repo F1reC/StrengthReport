@@ -6,6 +6,7 @@ import { CategoryOverview } from './components/CategoryOverview';
 import { StrengthsList } from './components/StrengthsList';
 import { parseStrengthsText } from './utils/parseStrengths';
 import { Strength, StrengthCategories } from './types/strength';
+import { ReportOverview } from './components/ReportOverview';
 
 const strengthCategories: StrengthCategories = {
   '战略思维': {
@@ -54,6 +55,7 @@ function App() {
 
         {hasAnalysis && (
           <>
+            <ReportOverview strengths={strengths} />
             <CategoryOverview 
               categories={strengthCategories}
               strengths={strengths}

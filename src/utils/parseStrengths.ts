@@ -1,33 +1,51 @@
 export const parseStrengthsText = (text: string) => {
-  const lines = text.split('\n').filter(line => line.trim());
-  const strengths: any[] = [];
+  // 移除页码和URL等无关信息
+  const cleanText = text.replace(/https?:\/\/[^\s]+/g, '')
+                       .replace(/页码#\s*\d+\/\d+/g, '')
+                       .replace(/\d{4}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/g, '');
   
+  // 分割文本为行
+  const lines = cleanText.split('\n')
+    .filter(line => line.trim())
+    .filter(line => !line.startsWith('您的优势识别器'))
+    .filter(line => !line.includes('位数 名称 分类'));
+
+  const strengths: any[] = [];
   const validCategories = ['战略思维', '关系建立', '影响力', '执行力'];
   
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const match = line.match(/(\d+)\s+(\S+)\s+(\S+)\s+(.+)/);
+  let currentStrength: any = {};
+  
+  for (let line of lines) {
+    // 匹配每个优势的基本信息
+    const basicMatch = line.match(/^(\d+)\s+(\S+)\s+(\S+)\s+(.+?)\s+([\d.]+)$/);
     
-    if (match) {
-      const [_, rank, name, category, rest] = match;
-      const coefficientMatch = rest.match(/(\d+\.\d+)/);
-      const coefficient = coefficientMatch ? parseFloat(coefficientMatch[1]) : 0;
-      const description = rest.replace(/\d+\.\d+/, '').trim();
+    if (basicMatch) {
+      const [_, rank, name, category, description, coefficient] = basicMatch;
       
-      // Normalize category name to ensure it matches our defined categories
+      // 标准化分类名称
       const normalizedCategory = validCategories.find(
         c => c === category || category.includes(c)
       ) || '其他';
       
-      strengths.push({
+      currentStrength = {
         rank: parseInt(rank),
-        name,
+        name: name.trim(),
         category: normalizedCategory,
-        coefficient,
-        description
-      });
+        description: description.trim()
+          .replace(/["""]/g, '') // 移除中文引号
+          .replace(/\s+/g, ' '), // 规范化空格
+        coefficient: parseFloat(coefficient)
+      };
+      
+      strengths.push(currentStrength);
+    } else if (line.trim() && currentStrength) {
+      // 如果是描述的延续部分，附加到当前优势的描述中
+      currentStrength.description += ' ' + line.trim()
+        .replace(/["""]/g, '')
+        .replace(/\s+/g, ' ');
     }
   }
   
-  return strengths;
+  // 按系数排序
+  return strengths.sort((a, b) => b.coefficient - a.coefficient);
 };
