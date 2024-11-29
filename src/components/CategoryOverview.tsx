@@ -1,5 +1,6 @@
 import React from 'react';
 import { Strength, StrengthCategories } from '../types/strength';
+import { LucideIcon } from 'lucide-react';
 
 interface CategoryOverviewProps {
   categories: StrengthCategories;
